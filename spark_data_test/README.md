@@ -4,84 +4,6 @@
 
 `spark-data-test` provides utilities to compare two Spark DataFrames or datasets, generating detailed reports on matches, mismatches, and missing records. It is designed for data validation, ETL testing, and regression testing in Spark pipelines.
 
-## Configuration Dataclasses
-
-Below are the main dataclasses used for configuration in `spark-data-test`. You can use these directly in Python or as a reference for your YAML/JSON configs.
-
-### DatasetParams
-
-Defines parameters for a single dataset comparison.
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class DatasetParams:
-    dataset_name: str                  # Name of the dataset/table
-    primary_keys: list                 # List of primary key column names
-    select_cols: list = field(default_factory=lambda: ["*"])  # Columns to select (default: all)
-    drop_cols: list = field(default_factory=list)             # Columns to drop (default: none)
-```
-
-### DataframeConfig
-
-Defines how to read a DataFrame from storage.
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class DataframeConfig:
-    path: str                          # Path to the data (e.g., file or table)
-    file_format: str = "parquet"       # File format (parquet, csv, etc.)
-    spark_options: dict = field(default_factory=dict)  # Spark read options (e.g., {"header": "true"})
-```
-
-### OutputConfig
-
-Defines output options for writing comparison results.
-
-```python
-from dataclasses import dataclass, field
-
-@dataclass
-class OutputConfig:
-    output_dir: str                    # Directory to write output files
-    output_file_format: str = "parquet" # Output file format
-    spark_options: dict = field(default_factory=dict)  # Spark write options
-    no_of_partitions: int = -1         # Number of partitions for output (-1 for default)
-```
-
-### DatasetConfig
-
-Groups together the configs for a single dataset comparison.
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class DatasetConfig:
-    params: DatasetParams              # Dataset parameters
-    source_config: DataframeConfig     # Source DataFrame config
-    target_config: DataframeConfig     # Target DataFrame config
-```
-
-### ComparisonJobConfig
-
-Top-level config for a comparison job (can include multiple datasets).
-
-```python
-from dataclasses import dataclass
-
-@dataclass
-class ComparisonJobConfig:
-    job_name: str                      # Name of the comparison job
-    dataset_configs: list[DatasetConfig] # List of dataset configs to compare
-    output_config: OutputConfig        # Output config for all results
-```
-
----
-
 ## Usage
 
 ### 1. Compare DataFrames Directly
@@ -209,10 +131,10 @@ Column-level report showing the count of unmatched values for each non-key colum
 
 Row-level report with primary keys, duplicate count, missing row status, and match status for each row.
 
-| dataset_name | id | duplicate_count | missing_row_status   | all_rows_matched |
-|--------------|----|----------------|----------------------|------------------|
-| table1       | 1  | 0              | PRESENT_IN_BOTH      | true             |
-| table1       | 2  | 0              | MISSING_AT_TARGET    | false            |
+| dataset_name | id | duplicate_count | missing_row_status | all_rows_matched |
+|--------------|----|----------------|--------------------|------------------|
+| table1       | 1  | 0              | PRESENT_IN_BOTH    | true             |
+| table1       | 2  | 0              | MISSING_AT_TARGET  | false            |
 
 ---
 
