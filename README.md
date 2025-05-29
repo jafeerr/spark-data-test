@@ -4,9 +4,119 @@
 
 `spark-data-test` provides utilities to compare two Spark DataFrames or datasets, generating detailed reports on matches, mismatches, and missing records. It is designed for data validation, ETL testing, and regression testing in Spark pipelines.
 
+## Installation
+
+To install, simply use `pip`:
+
+```
+$ pip install spark-data-test
+```
+
+## Requirements
+
+Minimum Python version supported by `spark-data-test` is 3.7.
+
+## Usage
+
+### 1. Compare DataFrames Directly
+
+Use `run_comparison_job_from_dfs` to compare two Spark DataFrames directly.
+
+#### Function Signature
+
+```python
+run_comparison_job_from_dfs(
+    spark: SparkSession,
+    job_name: str,
+    source_df: DataFrame,
+    target_df: DataFrame,
+    params: DatasetParams|dict,
+    output_config: OutputConfig|=dict
+)
+```
+
+#### Parameters
+
+- `spark`: The active `SparkSession`.
+- `job_name`: Name for the comparison job (used in output paths).
+- `source_df`: Source DataFrame.
+- `target_df`: Target DataFrame.
+- `params`: An instance of `DatasetParams` specifying dataset name, primary keys, columns to select/drop, etc.
+- `output_config`: An instance of `OutputConfig` specifying output directory, file format, Spark write options, etc.
+
+#### Example
+
+```python
+from spark_data_test.jobs.comparison_job import run_comparison_job_from_dfs
+from spark_data_test.entities.config import DatasetParams, OutputConfig
+
+params = DatasetParams(
+    dataset_name="my_table",
+    primary_keys=["id"]
+)
+output_config = OutputConfig(
+    output_dir="/tmp/comparison_results"
+)
+
+run_comparison_job_from_dfs(spark, "my_job", df1, df2, params, output_config)
+```
+
+---
+
+### 2. Compare Using Config (dict/dataclasses)
+
+Use `run_comparison_job` to compare multiple datasets using a configuration dictionary or object.
+
+#### Function Signature
+
+```python
+run_comparison_job(
+    spark: SparkSession,
+    config: ComparisonJobConfig | dict
+)
+```
+
+#### Parameters
+
+- `spark`: The active `SparkSession`.
+- `config`: A dictionary or `ComparisonJobConfig` instance describing one or more datasets to compare, their source/target configs, and output config.
+
+#### Example
+
+```python
+from spark_data_test.jobs.comparison_job import run_comparison_job
+
+config = {
+    "job_name": "multi_dataset_job",
+    "dataset_configs": [
+        {
+            "params": {
+                "dataset_name": "table1",
+                "primary_keys": ["id"]
+            },
+            "source_config": {
+                "path": "/data/source/table1",
+                "file_format": "parquet"
+            },
+            "target_config": {
+                "path": "/data/target/table1",
+                "file_format": "parquet"
+            }
+        }
+    ],
+    "output_config": {
+        "output_dir": "/tmp/comparison_results"
+    }
+}
+
+run_comparison_job(spark, config)
+```
+
+---
+
 ## Configuration Dataclasses
 
-Below are the main dataclasses used for configuration in `spark-data-test`. You can use these directly in Python or as a reference for your YAML/JSON configs.
+Below are the main dataclasses used for configuration in `spark-data-test`. You can use these directly in Python or as a reference for your JSON configs.
 
 ### DatasetParams
 
@@ -78,104 +188,6 @@ class ComparisonJobConfig:
     job_name: str                      # Name of the comparison job
     dataset_configs: list[DatasetConfig] # List of dataset configs to compare
     output_config: OutputConfig        # Output config for all results
-```
-
----
-
-## Usage
-
-### 1. Compare DataFrames Directly
-
-Use `run_comparison_job_from_dfs` to compare two Spark DataFrames directly.
-
-#### Function Signature
-
-```python
-run_comparison_job_from_dfs(
-    spark: SparkSession,
-    job_name: str,
-    source_df: DataFrame,
-    target_df: DataFrame,
-    params: DatasetParams,
-    output_config: OutputConfig
-)
-```
-
-#### Parameters
-
-- `spark`: The active `SparkSession`.
-- `job_name`: Name for the comparison job (used in output paths).
-- `source_df`: Source DataFrame.
-- `target_df`: Target DataFrame.
-- `params`: An instance of `DatasetParams` specifying dataset name, primary keys, columns to select/drop, etc.
-- `output_config`: An instance of `OutputConfig` specifying output directory, file format, Spark write options, etc.
-
-#### Example
-
-```python
-from spark_data_test.jobs.comparison_job import run_comparison_job_from_dfs
-from spark_data_test.entities.config import DatasetParams, OutputConfig
-
-params = DatasetParams(
-    dataset_name="my_table",
-    primary_keys=["id"]
-)
-output_config = OutputConfig(
-    output_dir="/tmp/comparison_results"
-)
-
-run_comparison_job_from_dfs(spark, "my_job", df1, df2, params, output_config)
-```
-
----
-
-### 2. Compare Using Config (YAML/JSON/dict)
-
-Use `run_comparison_job` to compare multiple datasets using a configuration dictionary or object.
-
-#### Function Signature
-
-```python
-run_comparison_job(
-    spark: SparkSession,
-    config: dict or ComparisonJobConfig
-)
-```
-
-#### Parameters
-
-- `spark`: The active `SparkSession`.
-- `config`: A dictionary or `ComparisonJobConfig` instance describing one or more datasets to compare, their source/target configs, and output config.
-
-#### Example
-
-```python
-from spark_data_test.jobs.comparison_job import run_comparison_job
-
-config = {
-    "job_name": "multi_dataset_job",
-    "dataset_configs": [
-        {
-            "params": {
-                "dataset_name": "table1",
-                "primary_keys": ["id"]
-            },
-            "source_config": {
-                "path": "/data/source/table1",
-                "file_format": "parquet"
-            },
-            "target_config": {
-                "path": "/data/target/table1",
-                "file_format": "parquet"
-            }
-        }
-    ],
-    "output_config": {
-        "output_dir": "/tmp/comparison_results"
-    }
-}
-
-run_comparison_job(spark, config)
 ```
 
 ---
