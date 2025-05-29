@@ -8,6 +8,8 @@ except KeyError:
 setuptools.setup(
     name="spark_data_test",
     description="A library for validating and comparing datasets in Spark using PySpark.",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     author="Jafeer Ali",
     author_email="jafeeralin@gmail.com",
     license="MIT",
@@ -18,6 +20,6 @@ setuptools.setup(
     ],
     extras_require={
         "dev": ["pytest>=5", "pytest-cov"]
-    }
+    },
     python_requires='>=3.7',
 )

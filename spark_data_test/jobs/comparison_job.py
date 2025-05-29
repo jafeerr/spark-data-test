@@ -33,7 +33,7 @@ def __apply_source_target_transformations(df, suffix, non_key_cols, params):
     )
 
 
-def __process_unmatched_records(unmatched_records, key_cols, non_key_cols):
+def __process_unmatched_records(unmatched_records, non_key_cols):
     return apply_spark_transformations(
         unmatched_records, __add_matched_column, non_key_cols
     )
@@ -104,7 +104,7 @@ def __get_row_level_test_report(dataset_name, joined_df, key_cols):
         ALL_ROWS_MATCHED_COL
     ).withColumn(
         DUPLICATE_COUNT_COL,
-        f.count("*").over(Window.partitionBy(*key_cols)) - 1
+        f.count("*").over(Window.partitionBy(*key_cols).rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)) - 1
     ).withColumn(
         MISSING_ROW_STATUS_COL,
         f.when(
@@ -169,7 +169,6 @@ def compare_dataframes(spark, source_df, target_df, params):
             & (f.col(SRC_COL_SUFFIX.format(CHK_SUM_COL)).isNotNull())
             & (f.col(TGT_COL_SUFFIX.format(CHK_SUM_COL)).isNotNull())
         ),
-        params.primary_keys,
         non_key_cols
     )
 
