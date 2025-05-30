@@ -1,0 +1,24 @@
+on: ["push", "pull_request"]
+
+name: Run Test Coverage
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: x64
+
+      - name: python install, run test-coverage
+        run: |
+          pip install -e ".[dev]"
+          python -m pytest --cov=spark_data_test --cov-report xml
+  
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: coverage.xml

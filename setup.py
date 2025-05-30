@@ -16,7 +16,8 @@ setuptools.setup(
     version=version,
     packages=["spark_data_test"],
     install_requires=[
-        'dacite>=v1.9.2'
+        'dacite>=v1.9.2',
+        'pyspark==3.5.6'
     ],
     extras_require={
         "dev": ["pytest>=5", "pytest-cov"]
