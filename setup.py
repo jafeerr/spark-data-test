@@ -20,7 +20,7 @@ setuptools.setup(
         'pyspark==3.5.6'
     ],
     extras_require={
-        "dev": ["pytest>=5", "pytest-cov", "pandas", "pyarrow"]
+        "dev": ["numpy==1.26.4","pytest>=5", "pytest-cov", "pandas==2.2.2", "pyarrow==14.0.2"]
     },
     python_requires='>=3.7',
 )
