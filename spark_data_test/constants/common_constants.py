@@ -13,6 +13,7 @@ LEFT_JOIN = "left"
 SRC_COL_SUFFIX = "{0}_src"
 TGT_COL_SUFFIX = "{0}_target"
 MATCHED_COL_SUFFIX = "{0}_matched"
+MATCHED_SUFFIX = "_matched"
 
 #common col names
 CHK_SUM_COL = "_chk_sum"
@@ -38,6 +39,7 @@ UNMATCHED_ROWS_COUNT_COL = "unmatched_rows_count"
 
 #row level report
 ALL_ROWS_MATCHED_COL = "all_rows_matched"
+ALL_ROWS_MATCHED_AFTR_TOL_COL = "all_rows_matched_after_tolerance"
 DUPLICATE_COUNT_COL = "duplicate_count"
 MISSING_ROW_STATUS_COL = "missing_row_status"
 MISSING_AT_SOURCE_STATUS = "MISSING_AT_SOURCE"
