@@ -1,6 +1,6 @@
 import setuptools
 import os
-version = '0.1.0'
+version = '0.1.1'
 try:
     version =os.environ['APP_VERSION']
 except KeyError:
