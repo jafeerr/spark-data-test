@@ -44,7 +44,7 @@ run_comparison_job_from_dfs(
 - `source_df`: Source DataFrame.
 - `target_df`: Target DataFrame.
 - `params`: An instance of `DatasetParams` specifying dataset name, primary keys, columns to select/drop, etc.
-- `output_config`: An instance of `OutputConfig` specifying output directory, file format, Spark write options, etc.
+- `output_config`: An instance of [`OutputConfig`](#outputconfig) specifying output directory, file format, Spark write options, etc.
 
 #### Example
 
@@ -81,7 +81,7 @@ run_comparison_job(
 #### Parameters
 
 - `spark`: The active `SparkSession`.
-- `config`: A dictionary or `ComparisonJobConfig` instance describing one or more datasets to compare, their source/target configs, and output config.
+- `config`: A dictionary or [`ComparisonJobConfig`](#comparisonjobconfig) instance describing one or more datasets to compare, their source/target configs, and output config.
 
 #### Example
 
@@ -116,23 +116,87 @@ run_comparison_job(spark, config)
 
 ---
 
+## Example Configuration (Python dict)
+
+Below is an example of how to create a configuration dictionary for `run_comparison_job` using the dataclass structure:
+
+```python
+config = {
+    "job_name": "sample_comparison_job",
+    "dataset_configs": [
+        {
+            "params": {
+                "dataset_name": "table1",
+                "primary_keys": ["id"],
+                "test_params": {"difference_tolerance": 0.1},
+                "select_cols": ["id", "name", "value"],
+                "drop_cols": []
+            },
+            "source_config": {
+                "path": "/data/source/table1",
+                "file_format": "parquet",
+                "spark_options": {}
+            },
+            "target_config": {
+                "path": "/data/target/table1",
+                "file_format": "parquet",
+                "spark_options": {}
+            }
+        },
+        {
+            "params": {
+                "dataset_name": "table2",
+                "primary_keys": ["key"],
+                "test_params": {"difference_tolerance": 0.0},
+                "select_cols": ["key", "amount"],
+                "drop_cols": ["extra_col"]
+            },
+            "source_config": {
+                "path": "/data/source/table2",
+                "file_format": "csv",
+                "spark_options": {"header": "true"}
+            },
+            "target_config": {
+                "path": "/data/target/table2",
+                "file_format": "csv",
+                "spark_options": {"header": "true"}
+            }
+        }
+    ],
+    "output_config": {
+        "output_dir": "/tmp/comparison_results",
+        "output_file_format": "parquet",
+        "spark_options": {},
+        "no_of_partitions": -1
+    }
+}
+```
+
+You can pass this config directly to `run_comparison_job(spark, config)`.
+
+---
+
 ## Configuration Dataclasses
 
 Below are the main dataclasses used for configuration in `spark-data-test`. You can use these directly in Python or as a reference for your JSON configs.
 
 ### DatasetParams
-
 Defines parameters for a single dataset comparison.
-
+```python
+@dataclass
+class TestParams:
+    difference_margin: float = 0.0  # Allowed numeric difference for matching numeric columns.
+```
 ```python
 from dataclasses import dataclass, field
 
 @dataclass
 class DatasetParams:
-    dataset_name: str                  # Name of the dataset/table
-    primary_keys: list                 # List of primary key column names
-    select_cols: list = field(default_factory=lambda: ["*"])  # Columns to select (default: all)
-    drop_cols: list = field(default_factory=list)             # Columns to drop (default: none)
+    dataset_name: str  # Name of the dataset/table
+    primary_keys: list # List of primary key column names
+    test_params: TestParams # Testing parameters for dataset (Optional)
+    select_cols: list # Columns to select (default: all) (Optional)
+    drop_cols: list # Columns to drop (default: none) (Optional)
 ```
 
 ### DataframeConfig
@@ -144,9 +208,9 @@ from dataclasses import dataclass, field
 
 @dataclass
 class DataframeConfig:
-    path: str                          # Path to the data (e.g., file or table)
-    file_format: str = "parquet"       # File format (parquet, csv, etc.)
-    spark_options: dict = field(default_factory=dict)  # Spark read options (e.g., {"header": "true"})
+    path: str        # Path to the data (e.g., file or table)
+    file_format: str # File format (parquet, csv, etc.) (default:parquet) (Optional)
+    spark_options: dict # Spark read options (e.g., {"header": "true"}) (Optional)
 ```
 
 ### OutputConfig
@@ -158,10 +222,10 @@ from dataclasses import dataclass, field
 
 @dataclass
 class OutputConfig:
-    output_dir: str                    # Directory to write output files
-    output_file_format: str = "parquet" # Output file format
-    spark_options: dict = field(default_factory=dict)  # Spark write options
-    no_of_partitions: int = -1         # Number of partitions for output (-1 for default)
+    output_dir: str         # Directory to write output files
+    output_file_format: str # Output file format (default:parquet) (Optional)
+    spark_options: dict  # Spark write options (Optional)
+    no_of_partitions: int = -1 # Number of partitions for output (-1 for default partitions) (Optional)
 ```
 
 ### DatasetConfig
@@ -200,7 +264,7 @@ After running a comparison job, the following files/directories are generated un
 
 ### **overall_test_report**
 
-Summary DataFrame with row counts, matched counts, duplicate counts, missing rows, and test status for each dataset.
+Summary DataFrame with row counts, matched counts, duplicate counts, missing rows, and test status for each dataset. Output will generate under `<output_dir>/<job_name>/overall_test_report`
 
 | dataset_name | count                | matched_count | duplicate_count         | missing_rows           | test_status |
 |--------------|----------------------|---------------|------------------------|------------------------|-------------|
@@ -210,7 +274,7 @@ Summary DataFrame with row counts, matched counts, duplicate counts, missing row
 
 ### **col_lvl_test_report**
 
-Column-level report showing the count of unmatched values for each non-key column.
+Column-level report showing the count of unmatched values for each non-key column. Output will generate under `<output_dir>/<job_name>/col_lvl_test_report`
 
 | dataset_name | column_name | unmatched_rows_count |
 |--------------|-------------|---------------------|
@@ -221,7 +285,7 @@ Column-level report showing the count of unmatched values for each non-key colum
 
 ### **row_lvl_test_report**
 
-Row-level report with primary keys, duplicate count, missing row status, and match status for each row.
+Row-level report with primary keys, duplicate count, missing row status, and match status for each row. Output will generate under `<output_dir>/<job_name>/row_lvl_test_report`
 
 | dataset_name | id | duplicate_count | missing_row_status   | all_rows_matched |
 |--------------|----|----------------|----------------------|------------------|
@@ -232,7 +296,7 @@ Row-level report with primary keys, duplicate count, missing row status, and mat
 
 ### **unmatched_rows/**
 
-Directory containing one file per column with all rows where that column did not match between source and target.
+Directory containing one file per column with all rows where that column did not match between source and target. Output will generate under `<output_dir>/<job_name>/unmatched_rows/<dataset_name>/<column_name>`
 
 Example for `unmatched_rows/colA`:
 
