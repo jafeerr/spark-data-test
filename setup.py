@@ -1,6 +1,6 @@
 import setuptools
 import os
-version = '0.1.1'
+version = '0.1.2'
 try:
     version =os.environ['APP_VERSION']
 except KeyError:
@@ -14,7 +14,7 @@ setuptools.setup(
     author_email="jafeeralin@gmail.com",
     license="MIT",
     version=version,
-    packages=["spark_data_test"],
+    packages=setuptools.find_packages(),
     install_requires=[
         'dacite>=v1.9.2',
         'pyspark==3.5.6'
