@@ -2,6 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/jafeerr/spark-data-test/badge.svg?branch=main)](https://coveralls.io/github/jafeerr/spark-data-test?branch=main)
 [![License](https://img.shields.io/pypi/l/spark-data-test.svg)](https://pypi.python.org/pypi/spark-data-test/)
 [![Version](https://img.shields.io/pypi/v/spark-data-test.svg)](https://pypi.python.org/pypi/spark-data-test/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/spark-data-test?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/spark-data-test)
 ## Overview
 
 `spark-data-test` provides utilities to compare two Spark DataFrames or datasets, generating detailed reports on matches, mismatches, and missing records. It is designed for data validation, ETL testing, and regression testing in Spark pipelines.
