@@ -269,7 +269,7 @@ Summary DataFrame with row counts, matched counts, duplicate counts, missing row
 
 | dataset_name | count                | matched_count | duplicate_count         | missing_rows           | test_status |
 |--------------|----------------------|---------------|------------------------|------------------------|-------------|
-| table1       | {"source": 100, "target": 98} | 97            | {"source": 0, "target": 1} | {"source": 1, "target": 3} | PASSED      |
+| table1       | {"source": 100, "target": 98} | 97            | {"source": 0, "target": 1} | {"source": 1, "target": 3} | FAILED      |
 
 ---
 
